@@ -13,7 +13,8 @@ def stochasticHillClimbing(lista:list):
     for position in range(len(lista)):
         listaVizinhos = lista.copy()
         posicaoAtual = rainha(position, lista[position])
-        del listaVizinhos[position]
+        #del listaVizinhos[position]
+        listaVizinhos[position] = None
         print(posicaoAtual)
         print(listaVizinhos)
         print(checarCusto(posicaoAtual, listaVizinhos))
@@ -37,10 +38,10 @@ def checarCusto(posicaoRainha:rainha,lista:list):
     
     for i in range(0,len(lista),1):
         #Checar na horizontal
-        if posicaoRainha.coluna == lista[i]:
+        if posicaoRainha.coluna == lista[i] and lista[i] != None:
             pares += 1
         #Checar na vertical
-        if posicaoRainha.linha == i:
+        if posicaoRainha.linha == i and lista[i] != None:
             pares += 1
         #Checar na diagonal da esquerda para a direita
         
