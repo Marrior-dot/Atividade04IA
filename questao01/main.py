@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 import array
 
 class rainha():
@@ -11,31 +11,43 @@ class rainha():
 
 def stochasticHillClimbing(lista:list):
     for position in range(len(lista)):
-        listaVizinhos = lista.copy()
+        custos = []
+        #Lista para modificar as posições do vizinho e da posição atual
+        listaVizinhosModificar = lista.copy()
+        #Lista para procurar os vizinhos
+        listaVizinhosProcurar = lista.copy()
         posicaoAtual = rainha(position, lista[position])
-        #del listaVizinhos[position]
-        listaVizinhos[position] = None
-        print(posicaoAtual)
-        print(listaVizinhos)
-        print(checarCusto(posicaoAtual, listaVizinhos))
-        print("---------------------------------------------------")
+        #listaVizinhos[position] = None
+        listaVizinhosModificar[position] = None
+        del listaVizinhosProcurar[position]
+        #print(posicaoAtual)
+        #print(listaVizinhos)
+        #print(checarCusto(posicaoAtual, listaVizinhos))
+        #print("---------------------------------------------------")
 
-        #for vizinho in range(len(listaVizinhos)):
-        #    if(checarCusto(rainha(vizinho, listaVizinhos[vizinho]), lista) <= checarCusto(posicaoAtual, lista)):
-        #        posicaoVizinhoAleatorio = randint(0, len(listaVizinhos)-1)
-        #        vizinhoAleatorio = rainha(posicaoVizinhoAleatorio, listaVizinhos[posicaoVizinhoAleatorio])
+        for vizinho in range(len(listaVizinhosProcurar)):
+            #if listaVizinhos[vizinho] == None:
+            #    continue
+            #Escolhe de maneira aleatória uma coluna para o vizinho
+            colunaVizinho = choice(listaVizinhosProcurar)
+            #Usa o valor da coluna para conseguir o valor da linha do vizinho
+            linhaVizinho = listaVizinhosModificar.index(colunaVizinho)     
+            if(checarCusto(rainha(linhaVizinho, colunaVizinho), listaVizinhosModificar) <= checarCusto(posicaoAtual, listaVizinhosModificar)):
+                #lista[]
+                lista[position] = colunaVizinho
+                posicaoAtual = rainha(position, colunaVizinho) #vizinhoAleatorio
+                break
 
+    tabuleiro = gerarTabuleiro(lista)
 
-        #while checarCustoVizinhos(listacopy, lista[position]):
-        #    posicaVizinho = randint(0, len(listacopy)-1)
-        #    vizinho = listacopy[posicaVizinho]
-        #    if posicaVizinho <= position:
-        #        lista[position] = vizinho
-        #        tabuleiro[position][posicaVizinho] = 1
-        #        break
+    for i in tabuleiro:
+        print(f"{i}\n")
+              
 def checarCusto(posicaoRainha:rainha,lista:list):
     pares = 0
-    
+    jEsquerda = posicaoRainha.coluna
+    jDireita = posicaoRainha.coluna
+    #Checar na horizontal e na vertical
     for i in range(0,len(lista),1):
         #Checar na horizontal
         if posicaoRainha.coluna == lista[i] and lista[i] != None:
@@ -43,15 +55,63 @@ def checarCusto(posicaoRainha:rainha,lista:list):
         #Checar na vertical
         if posicaoRainha.linha == i and lista[i] != None:
             pares += 1
-        #Checar na diagonal da esquerda para a direita
+
+    #Checar na diagonal subindo
+    for i in range(posicaoRainha.linha,0,-1):
+        rDone = False
+        lDone = False
+
+        try:
+            #Checar na diagonal subindo para a esquerda
+            if lista[i] != None and lista[i] == jEsquerda:
+                pares += 1
+            #Checar na diagonal subindo para a direita
+            if lista[i] != None and lista[i] == jDireita:
+                pares += 1
+        except IndexError:
+            pass
         
+        rDone = True if jDireita == len(lista) else False
+        lDone = True if jEsquerda == 0 else False
+
+        jEsquerda -= 1
+        jDireita += 1
+        if rDone and lDone:
+            break
     
-    
-    #Checar na diagonal
+    jEsquerda = posicaoRainha.coluna
+    jDireita = posicaoRainha.coluna
+
+
+    for i in range(posicaoRainha.linha,len(lista)-1,1):
+        rDone = False
+        lDone = False
+
+        try:
+            if lista[i] != None and lista[i] == jEsquerda:
+                pares += 1
+            if lista[i] != None and lista[i] == jDireita:
+                pares += 1
+        except IndexError:
+            pass
+        
+        rDone = True if jDireita == len(lista) else False
+        lDone = True if jEsquerda == 0 else False
+
+        jEsquerda -= 1
+        jDireita += 1
+        if rDone and lDone:
+            break
+    #Checar na diagonal descendo
     return pares
 
+def compararCustos(listaVizinhos:list, posicaAtual:rainha, listaRainhas:list):
+    for i in listaVizinhos:
+        if checarCusto(posicaAtual, listaRainhas) < checarCusto(rainha(i, listaRainhas[i]), listaRainhas):
+            return True
+    return False
 
-    
+
 def gerarLista():
     lista = []
     for i in range(0,8,1):
@@ -69,7 +129,4 @@ def gerarTabuleiro(lista:list):
     return tabuleiro
 
 lista = gerarLista()
-tabuleiro = gerarTabuleiro(lista)
 stochasticHillClimbing(lista)
-for i in tabuleiro:
-    print(f"{i}\n")
