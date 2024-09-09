@@ -1,4 +1,6 @@
 import random
+import numpy as np
+import time
 
 def gerar_individuo():
     individuo = []
@@ -47,8 +49,6 @@ def printar_tabuleiro(individuo):
 def stochastic_hill_climbing():
     individuo = gerar_individuo()
     aptidao = calcular_aptidao(individuo)
-    print(individuo, aptidao)
-    printar_tabuleiro(individuo)
 
     qtd_maxima_falhas = 500
     falhas = 0
@@ -68,11 +68,38 @@ def stochastic_hill_climbing():
         else:
             falhas += 1
     
-    return individuo, aptidao
+    return individuo, aptidao, falhas
+
+def media_algoritmo():
+    melhores_solucoes = []
+    cinco_maiores = []
+    media_falhas = []
+    tempoExecucao = []
+    for i in range(50):
+        time_inicial = time.time()
+        individuo, aptidao, falhas = stochastic_hill_climbing()
+        time_final = time.time()
+        tempoExecucao.append(time_final - time_inicial)
+        media_falhas.append(falhas)
+        melhores_solucoes. append((individuo,aptidao))
+
+    media_falhas_media = np.mean(media_falhas)
+    media_falhas_desvio_padrao = np.std(media_falhas)
+    media_tempoExecucao = np.mean(tempoExecucao)
+    desvio_padrao_tempoExecucao = np.std(tempoExecucao)
+    print(f"Média de iterações: {media_falhas_media}")
+    print(f"Desvio padrão de iterações: {media_falhas_desvio_padrao}")
+    print(f"Média de tempo de execução: {media_tempoExecucao}")
+    print(f"Desvio padrão de tempo de execução: {desvio_padrao_tempoExecucao}\n")
+
+    cinco_maiores = sorted(melhores_solucoes, key=lambda x: x[1], reverse=True)[:5]
+    for i in range(5):
+        print(f"\nSolução {i+1}: Indivíduo: {cinco_maiores[i][0]} / Fitness: {cinco_maiores[i][1]}")
+        printar_tabuleiro(cinco_maiores[i][0])
+
+individuo = stochastic_hill_climbing()
+media_algoritmo()
 
 
-individuo, aptidao = stochastic_hill_climbing()
-print("O individuo é "+str(individuo))
-print("A aptidao é "+str(aptidao))
-printar_tabuleiro(individuo)
-
+    
+    
